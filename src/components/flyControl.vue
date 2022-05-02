@@ -102,6 +102,7 @@ onMounted(() => {
 
     camera.flyToBoundingSphere(new Cesium.BoundingSphere(n, 4000), {
       duration: 1,
+      maximumHeight:100,
       offset: new Cesium.HeadingPitchRange(0, -0.1, 0),
       complete: () => {
         viewer.selectedEntity = tour;

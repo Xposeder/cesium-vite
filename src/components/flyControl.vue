@@ -41,6 +41,7 @@ onMounted(() => {
     });
   });
   start.value = () => {
+    //清除上一次的漫游并重新开始
     clearInterval(fly);
     fly = setInterval(() => {
       tourFly();
@@ -62,6 +63,7 @@ onMounted(() => {
     tourFly(false);
   };
   function tourFly(next = true) {
+    //判断前往下个站点还是上个站点
     if (next) {
       i++;
     } else {
@@ -70,13 +72,13 @@ onMounted(() => {
     //获取当前漫游点
     const tour = tours[i];
     const p = tour.position;
-
+    //获取笛卡尔坐标
     const v = p.getValue(clock.currentTime);
     const c = Cesium.Cartographic.fromCartesian(v);
-    const n = Cesium.Cartesian3.fromRadians(c.longitude, c.latitude, 999);
-    
+    const tourPos = Cesium.Cartesian3.fromRadians(c.longitude, c.latitude, 999);
+
+    // 创建说明要素
     const img_url = `/长征图片/${tour.name}.png`;
-    // 创建对象
     const img = new Image();
     img.alt = tour.name;
     img.src = img_url;
@@ -86,12 +88,12 @@ onMounted(() => {
     div.innerHTML = ` 当前站点：${tour.name}<br>
       介绍：${tour.properties.PopupInfo._value}<br>`;
     div.appendChild(img);
-
     tour.description = div.innerHTML;
 
-    camera.flyToBoundingSphere(new Cesium.BoundingSphere(n, 4000), {
+    //将相机飞到当前视图包含提供的边界球的位置
+    camera.flyToBoundingSphere(new Cesium.BoundingSphere(tourPos, 4000), {
       duration: 1,
-      maximumHeight:100,
+      maximumHeight: 0,
       offset: new Cesium.HeadingPitchRange(0, -0.1, 0),
       complete: () => {
         viewer.selectedEntity = tour;

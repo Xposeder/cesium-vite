@@ -24,10 +24,6 @@ onMounted(() => {
   const { camera, clock } = viewer;
   let i = -1;
   Cesium.GeoJsonDataSource.load("点.json", {
-    // stroke: Cesium.Color.HOTPINK,
-    // fill: Cesium.Color.PINK,
-    // strokeWidth: 3,
-    // markerSymbol: "?",
     markerSize: 5,
   }).then(function (dataSource) {
     viewer.dataSources.add(dataSource).then((res) => {
@@ -36,11 +32,6 @@ onMounted(() => {
         tour.billboard = undefined;
         tour.label = new Cesium.LabelGraphics({
           text: tour.name,
-          // font: "12px monospace",
-          // horizontalOrigin: Cesium.HorizontalOrigin.LEFT,
-          // verticalOrigin: Cesium.VerticalOrigin.TOP,
-          // pixelOffset: new Cesium.Cartesian2(15, 0),
-          // scaleByDistance: new Cesium.NearFarScalar(1.5e2, 2.0, 1.5e7, 0.5),
           distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
             10.0,
             999999
@@ -64,8 +55,6 @@ onMounted(() => {
     clearInterval(fly);
   };
 
-  window.camera = camera;
-  window.viewer = viewer;
   next.value = () => {
     tourFly();
   };
@@ -78,19 +67,19 @@ onMounted(() => {
     } else {
       i--;
     }
+    //获取当前漫游点
     const tour = tours[i];
     const p = tour.position;
-    const v = p.getValue(clock.currentTime);
 
+    const v = p.getValue(clock.currentTime);
     const c = Cesium.Cartographic.fromCartesian(v);
     const n = Cesium.Cartesian3.fromRadians(c.longitude, c.latitude, 999);
-    // 定时执行获取宽高
+    
     const img_url = `/长征图片/${tour.name}.png`;
     // 创建对象
     const img = new Image();
     img.alt = tour.name;
     img.src = img_url;
-
     img.style = `width:100%;height:auto;object-fit: cover;`;
 
     const div = document.createElement("div");

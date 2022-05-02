@@ -33,28 +33,18 @@ onMounted(() => {
       },
     },
   });
-  //移除报错
+
   {
+    //移除报错
     const frame = viewer.infoBox.frame;
     frame.removeAttribute("sandbox");
     frame.src = "about:blank";
-    // console.log(frame);
-    frame.addEventListener(
-      "load",
-      function () {
-        var cssLink = frame.contentDocument.createElement("link");
-        cssLink.href = Cesium.buildModuleUrl("/infobox.css");
-        cssLink.rel = "stylesheet";
-        cssLink.type = "text/css";
-        frame.contentDocument.head.appendChild(cssLink);
-      },
-      false
-    );
+    //取消默认双击事件
+    viewer.screenSpaceEventHandler.setInputAction(function () {},
+    Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
   }
   main.viewer = viewer;
-  //取消默认双击事件
-  viewer.screenSpaceEventHandler.setInputAction(function () {},
-  Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+
   Cesium.GeoJsonDataSource.load("面.json", {
     stroke: Cesium.Color.RED,
     fill: new Cesium.Color(0, 0, 0, 0),

@@ -3,3 +3,4 @@ node_modules
 dist
 dist-ssr
 *.local
+src/components/main符号贴地版本.vue

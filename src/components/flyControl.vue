@@ -9,6 +9,8 @@
       type="number"
       v-model="tourInterval"
     />秒
+    <br>
+    搜索：<input type="text"  @keyup.enter="search" />
   </div>
 </template>
 <script setup>
@@ -17,6 +19,8 @@ const start = ref();
 const stop = ref();
 const last = ref();
 const next = ref();
+
+const search = ref();
 const tourInterval = ref(10);
 let fly, tours;
 onMounted(() => {
@@ -45,7 +49,6 @@ onMounted(() => {
     clearInterval(fly);
     fly = setInterval(() => {
       tourFly();
-      i++;
       if (i >= tours.length) {
         clearInterval(fly);
       }
@@ -62,6 +65,15 @@ onMounted(() => {
   last.value = () => {
     tourFly(false);
   };
+  console.log();
+  search.value = (e) => {
+    const { value } = e.target;
+    tours.forEach((tour) => {
+      if (tour.name.indexOf(value) > -1) {
+        return flyTo(tour);
+      }
+    });
+  };
   function tourFly(next = true) {
     //判断前往下个站点还是上个站点
     if (next) {
@@ -71,6 +83,9 @@ onMounted(() => {
     }
     //获取当前漫游点
     const tour = tours[i];
+    flyTo(tour)
+  }
+  function flyTo(tour){
     const p = tour.position;
     //获取笛卡尔坐标
     const v = p.getValue(clock.currentTime);
@@ -94,6 +109,7 @@ onMounted(() => {
     camera.flyToBoundingSphere(new Cesium.BoundingSphere(tourPos, 4000), {
       duration: 1,
       maximumHeight: 0,
+      //调整相机的角度
       offset: new Cesium.HeadingPitchRange(0, -0.1, 0),
       complete: () => {
         viewer.selectedEntity = tour;
@@ -107,7 +123,7 @@ onMounted(() => {
   position: absolute;
   top: 10;
   left: 10;
-  display: flex;
+  /* display: flex; */
   justify-content: center;
   align-items: center;
   z-index: 999;

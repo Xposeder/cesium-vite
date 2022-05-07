@@ -9,13 +9,11 @@ import { ref, onMounted } from "vue";
 import flyControl from "./flyControl.vue";
 const loadFlyControl = ref(false);
 const mapRef = ref(null);
+
 onMounted(() => {
   const viewer = new Cesium.Viewer(mapRef.value, {
-    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
-      url: "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer",
-    }),
     terrainProvider: Cesium.createWorldTerrain(),
-    baseLayerPicker: false,
+    // baseLayerPicker: false,
     animation: false,
     timeline: false,
     fullscreenButton: false,
@@ -33,6 +31,7 @@ onMounted(() => {
       },
     },
   });
+  viewer.scene.globe.depthTestAgainstTerrain = false
 
   {
     //移除报错

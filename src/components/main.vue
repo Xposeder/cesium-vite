@@ -1,19 +1,24 @@
 <template>
   <div>
     <div id="title">漫游长征路线三维地图展示</div>
-    <div id="container" ref="mapRef"><flyControl v-if="loadFlyControl" /></div>
+    <div id="container" ref="mapRef">
+      <pathRoam v-if="loadFlyControl" />
+    </div>
   </div>
-</template>
+</template>o90oijhnbv 
 <script setup>
 import { ref, onMounted } from "vue";
-import flyControl from "./flyControl.vue";
+import pathRoam from "./pathRoam.vue";
 const loadFlyControl = ref(false);
 const mapRef = ref(null);
 
 onMounted(() => {
   const viewer = new Cesium.Viewer(mapRef.value, {
-    terrainProvider: Cesium.createWorldTerrain(),
-    // baseLayerPicker: false,
+    baseLayerPicker: true,
+    terrainProvider: Cesium.createWorldTerrain({
+      requestWaterMask: true,
+      requestVertexNormals: true,
+    }),
     animation: false,
     timeline: false,
     fullscreenButton: false,
@@ -25,14 +30,9 @@ onMounted(() => {
     selectionIndicator: true,
     scene3DOnly: true,
     shouldAnimate: true,
-    contextOptions: {
-      webgl: {
-        alpha: false,
-      },
-    },
   });
-  viewer.scene.globe.depthTestAgainstTerrain = false
-
+  viewer.scene.globe.depthTestAgainstTerrain = false;
+  Cesium.GeoJsonDataSource.clampToGround = true;
   {
     //移除报错
     const frame = viewer.infoBox.frame;
@@ -43,22 +43,22 @@ onMounted(() => {
     Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
   }
   main.viewer = viewer;
+  loadFlyControl.value = true;
 
-  Cesium.GeoJsonDataSource.load("面.json", {
-    stroke: Cesium.Color.RED,
-    fill: new Cesium.Color(0, 0, 0, 0),
-    strokeWidth: 3,
-  }).then(function (dataSource) {
-    viewer.dataSources.add(dataSource).then((res) => {
-      viewer.flyTo(res.entities, {
-        duration: 1,
-      });
-      loadFlyControl.value = true;
-    });
-  });
-  Cesium.GeoJsonDataSource.load("线.json").then(function (dataSource) {
-    viewer.dataSources.add(dataSource).then((res) => {});
-  });
+
+
+  // Cesium.GeoJsonDataSource.load("面.json", {
+  //   // stroke: Cesium.Color.RED,
+  //   fill: new Cesium.Color(0.5, 0, 0, 0.3),
+  //   // strokeWidth: 3,
+  // }).then(function (dataSource) {
+  //   viewer.dataSources.add(dataSource).then((res) => {
+  //     viewer.flyTo(res.entities, {
+  //       duration: 1,
+  //     });
+  //     loadFlyControl.value = true;
+  //   });
+  // });
 });
 </script>
 <style scoped>

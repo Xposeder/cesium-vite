@@ -107,6 +107,7 @@ onMounted(() => {
 
     //将相机飞到当前视图包含提供的边界球的位置
     camera.flyToBoundingSphere(new Cesium.BoundingSphere(tourPos, 4000), {
+      easingFunction: Cesium.EasingFunction.LINEAR_NONE, //漫游路径插值与缓动函数
       duration: 1,
       maximumHeight: 0,
       //调整相机的角度

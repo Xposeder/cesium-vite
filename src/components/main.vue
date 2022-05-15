@@ -2,13 +2,13 @@
   <div>
     <div id="title">漫游长征路线三维地图展示</div>
     <div id="container" ref="mapRef">
-      <pathRoam v-if="loadFlyControl" />
+      <flyControl v-if="loadFlyControl" />
     </div>
   </div>
 </template>o90oijhnbv 
 <script setup>
 import { ref, onMounted } from "vue";
-import pathRoam from "./pathRoam.vue";
+import flyControl from "./flyControl.vue";
 const loadFlyControl = ref(false);
 const mapRef = ref(null);
 
@@ -29,7 +29,7 @@ onMounted(() => {
     infoBox: true,
     selectionIndicator: true,
     scene3DOnly: true,
-    shouldAnimate: true,
+    shouldAnimate: false,
   });
   viewer.scene.globe.depthTestAgainstTerrain = false;
   Cesium.GeoJsonDataSource.clampToGround = true;
@@ -43,9 +43,26 @@ onMounted(() => {
     Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
   }
   main.viewer = viewer;
-  loadFlyControl.value = true;
-
-
+  Cesium.GeoJsonDataSource.load("点.json", {
+    markerSize: 5,
+  }).then(function (dataSource) {
+    viewer.dataSources.add(dataSource).then((res) => {
+      const tours = res.entities.values;
+      console.log(tours);
+      tours.forEach((tour) => {
+        tour.billboard = undefined;
+        tour.label = new Cesium.LabelGraphics({
+          text: tour.name,
+          distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
+            10.0,
+            999999
+          ),
+        });
+      });
+      loadFlyControl.value = true;
+      main.tours = tours;
+    });
+  });
 
   // Cesium.GeoJsonDataSource.load("面.json", {
   //   // stroke: Cesium.Color.RED,

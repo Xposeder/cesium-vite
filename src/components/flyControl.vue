@@ -9,11 +9,13 @@
       type="number"
       v-model="tourInterval"
     />秒
-    <br>
-    搜索：<input type="text"  @keyup.enter="search" />
+    <br />
+    搜索：<input type="text" @keyup.enter="search" />
   </div>
 </template>
 <script setup>
+import Roaming from "./roam";
+
 import { ref, onMounted } from "vue";
 const start = ref();
 const stop = ref();
@@ -22,41 +24,25 @@ const next = ref();
 
 const search = ref();
 const tourInterval = ref(10);
-let fly, tours;
+let fly
 onMounted(() => {
   const viewer = main.viewer;
   const { camera, clock } = viewer;
-  let i = -1;
-  Cesium.GeoJsonDataSource.load("点.json", {
-    markerSize: 5,
-  }).then(function (dataSource) {
-    viewer.dataSources.add(dataSource).then((res) => {
-      tours = res.entities.values;
-      tours.forEach((tour) => {
-        tour.billboard = undefined;
-        tour.label = new Cesium.LabelGraphics({
-          text: tour.name,
-          distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
-            10.0,
-            999999
-          ),
-        });
-      });
-    });
+  const tours = main.tours;
+  new Roaming(viewer, {
+    modeluri: "CesiumAir/Cesium_Air.gltf",
+    time: 9900,
+    Lines: tours,
+    isPathShow: true,
   });
+  let i = -1;
+
   start.value = () => {
-    //清除上一次的漫游并重新开始
-    clearInterval(fly);
-    fly = setInterval(() => {
-      tourFly();
-      if (i >= tours.length) {
-        clearInterval(fly);
-      }
-    }, tourInterval.value * 1000);
+     viewer.clock.shouldAnimate =true
   };
 
   stop.value = () => {
-    clearInterval(fly);
+    viewer.clock.shouldAnimate =false
   };
 
   next.value = () => {
@@ -83,14 +69,9 @@ onMounted(() => {
     }
     //获取当前漫游点
     const tour = tours[i];
-    flyTo(tour)
+    flyTo(tour);
   }
-  function flyTo(tour){
-    const p = tour.position;
-    //获取笛卡尔坐标
-    const v = p.getValue(clock.currentTime);
-    const c = Cesium.Cartographic.fromCartesian(v);
-    const tourPos = Cesium.Cartesian3.fromRadians(c.longitude, c.latitude, 999);
+  function flyTo(tour) {
 
     // 创建说明要素
     const img_url = `/长征图片/${tour.name}.png`;
@@ -104,18 +85,8 @@ onMounted(() => {
       介绍：${tour.properties.PopupInfo._value}<br>`;
     div.appendChild(img);
     tour.description = div.innerHTML;
+viewer.selectedEntity = tour;
 
-    //将相机飞到当前视图包含提供的边界球的位置
-    camera.flyToBoundingSphere(new Cesium.BoundingSphere(tourPos, 4000), {
-      easingFunction: Cesium.EasingFunction.LINEAR_NONE, //漫游路径插值与缓动函数
-      duration: 1,
-      maximumHeight: 0,
-      //调整相机的角度
-      offset: new Cesium.HeadingPitchRange(0, -0.1, 0),
-      complete: () => {
-        viewer.selectedEntity = tour;
-      },
-    });
   }
 });
 </script>

@@ -4,11 +4,7 @@
     <button @click="next">下一站</button>
     <button @click="start">开始漫游</button>
     <button @click="stop">停止漫游</button>
-    漫游间隔：<input
-      style="width: 40px"
-      type="number"
-      v-model="tourInterval"
-    />秒
+
     <br />
     搜索：<input type="text" @keyup.enter="search" />
   </div>
@@ -23,8 +19,6 @@ const last = ref();
 const next = ref();
 
 const search = ref();
-const tourInterval = ref(10);
-let fly
 onMounted(() => {
   const viewer = main.viewer;
   const { camera, clock } = viewer;
@@ -38,11 +32,11 @@ onMounted(() => {
   let i = -1;
 
   start.value = () => {
-     viewer.clock.shouldAnimate =true
+    viewer.clock.shouldAnimate = true;
   };
 
   stop.value = () => {
-    viewer.clock.shouldAnimate =false
+    viewer.clock.shouldAnimate = false;
   };
 
   next.value = () => {
@@ -72,7 +66,6 @@ onMounted(() => {
     flyTo(tour);
   }
   function flyTo(tour) {
-
     // 创建说明要素
     const img_url = `/长征图片/${tour.name}.png`;
     const img = new Image();
@@ -85,8 +78,7 @@ onMounted(() => {
       介绍：${tour.properties.PopupInfo._value}<br>`;
     div.appendChild(img);
     tour.description = div.innerHTML;
-viewer.selectedEntity = tour;
-
+    viewer.selectedEntity = tour;
   }
 });
 </script>
